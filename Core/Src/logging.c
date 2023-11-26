@@ -5,32 +5,28 @@
  *      Author: nikola
  */
 
-
 #include "logging.h"
 #include <stdio.h>
 
 /* Definitions for myQueue01 */
 extern osMessageQueueId_t loggingQueue;
 
-
 void logEvent(Event_t event) {
 	osMessageQueuePut(loggingQueue, &event, 1, 100);
 }
-
 
 Event_t createMeasurementEvent(EventType_t type, void *value) {
 	Event_t event;
 
 	event.type = type;
 	if ((type == HumMeasurements) || (type == TempMeasurements)) {
-		event.value.floatVal = *((float *)value);
+		event.value.floatVal = *((float*) value);
 	} else {
-		event.value.intVal = *((int32_t *)value);
+		event.value.intVal = *((int32_t*) value);
 	}
 
 	return event;
 }
-
 
 void handleEvent(Event_t event) {
 	if (event.type == TempMeasurements) {
