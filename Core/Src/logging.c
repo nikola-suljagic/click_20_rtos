@@ -15,7 +15,7 @@ void logEvent(Event_t event) {
 	osMessageQueuePut(loggingQueue, &event, 1, 100);
 }
 
-Event_t createMeasurementEvent(EventType_t type, void *value) {
+Event_t createEvent(EventType_t type, void *value) {
 	Event_t event;
 
 	event.type = type;

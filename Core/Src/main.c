@@ -92,13 +92,10 @@ int main(void) {
 	/* Init scheduler */
 	osKernelInitialize();
 
-	/* Create the thread(s) */
-	/* creation of Measurements */
 	MeasurementsHandle = osThreadNew(TempHumMeasurements, NULL,
 			&Measurements_attributes);
 	ButtonsHandle = osThreadNew(ProcessingButtons, NULL, &Buttons_attributes);
 	LoggingHandle = osThreadNew(loggingHandle, NULL, &Logging_attributes);
-
 	loggingQueue = osMessageQueueNew(16, sizeof(Event_t),
 			&loggingQueue_attributes);
 	buttonSemaphoreHandle = osSemaphoreNew(1, 1, &buttonSemaphore_attributes);
@@ -106,7 +103,6 @@ int main(void) {
 	/* Start scheduler */
 	osKernelStart();
 
-	/* We should never get here as control is now taken by the scheduler */
 	/* Infinite loop */
 	while (1) {
 	}
@@ -254,9 +250,6 @@ static void MX_GPIO_Init(void) {
 	/* EXTI interrupt init*/
 	HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
 	HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
-
-	/* USER CODE BEGIN MX_GPIO_Init_2 */
-	/* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
@@ -264,28 +257,29 @@ int _write(int file, char *ptr, int len) {
 	HAL_UART_Transmit(&huart6, (uint8_t*) ptr, len, HAL_MAX_DELAY);
 	return len;
 }
-/* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_TempHumMeasurements */
+
 /**
  * @brief  Function implementing the Measurements thread.
  * @param  argument: Not used
  * @retval None
  */
-/* USER CODE END Header_TempHumMeasurements */
 void TempHumMeasurements(void *argument) {
-	/* USER CODE BEGIN 5 */
 	static float temperature, humidity;
 	/* Infinite loop */
 	for (;;) {
 		tempHumClick20GetMeasurements(&temperature, &humidity);
-		logEvent(createMeasurementEvent(TempMeasurements, &temperature));
-		logEvent(createMeasurementEvent(HumMeasurements, &humidity));
+		logEvent(createEvent(TempMeasurements, &temperature));
+		logEvent(createEvent(HumMeasurements, &humidity));
 		osDelay(4000);
 	}
-	/* USER CODE END 5 */
 }
 
+/**
+ * @brief Function implementing the loggingHandle thread.
+ * @param argument: Not used
+ * @retval None
+ */
 void loggingHandle(void *argument) {
 	Event_t event;
 	uint8_t prio = 1;
@@ -295,26 +289,20 @@ void loggingHandle(void *argument) {
 			handleEvent(event);
 		}
 	}
-	/* USER CODE END 5 */
 }
 
-/* USER CODE BEGIN Header_ProcessingButtons */
 /**
  * @brief Function implementing the Buttons thread.
  * @param argument: Not used
  * @retval None
  */
-/* USER CODE END Header_ProcessingButtons */
 void ProcessingButtons(void *argument) {
-	/* USER CODE BEGIN ProcessingButtons */
-	/* Infinite loop */
-
 	xSemaphoreTake(buttonSemaphoreHandle, 0xFFFF);
 	for (;;) {
 		xSemaphoreTakeRecursive(buttonSemaphoreHandle, portMAX_DELAY);
 		if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5) == GPIO_PIN_SET) {
 			int32_t value = 1;
-			logEvent(createMeasurementEvent(UserButton1Pressed, &value));
+			logEvent(createEvent(UserButton1Pressed, &value));
 		}
 	}
 }
@@ -328,15 +316,9 @@ void ProcessingButtons(void *argument) {
  * @retval None
  */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-	/* USER CODE BEGIN Callback 0 */
-
-	/* USER CODE END Callback 0 */
 	if (htim->Instance == TIM1) {
 		HAL_IncTick();
 	}
-	/* USER CODE BEGIN Callback 1 */
-
-	/* USER CODE END Callback 1 */
 }
 
 /**
@@ -344,12 +326,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
  * @retval None
  */
 void Error_Handler(void) {
-	/* USER CODE BEGIN Error_Handler_Debug */
 	/* User can add his own implementation to report the HAL error return state */
 	__disable_irq();
 	while (1) {
 	}
-	/* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT
