@@ -16,6 +16,9 @@
 #include "temp_hum_click20.h"
 
 
+#define LOGGING_QUEUE_SIZE     16
+
+
 void tasksInit(void);
 void TempHumMeasurements(void *argument);
 void loggingHandle(void *argument);
