@@ -4,7 +4,7 @@
  *  Created on: Nov 19, 2023
  *      Author: nikola
  */
-#include "cc2d23_pins.h"
+#include "temp_hum_click20_pins.h"
 #include "stm32f4xx_hal.h"
 
 void setEnablePin(uint8_t level) {

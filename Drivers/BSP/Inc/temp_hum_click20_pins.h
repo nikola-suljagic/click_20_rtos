@@ -5,8 +5,8 @@
  *      Author: nikola
  */
 
-#ifndef BSP_INC_CC2D23_PINS_H_
-#define BSP_INC_CC2D23_PINS_H_
+#ifndef BSP_INC_TEMP_HUM_CLICK20_PINS_H_
+#define BSP_INC_TEMP_HUM_CLICK20_PINS_H_
 
 #include "stm32f4xx_hal.h"
 
@@ -19,4 +19,4 @@
 void setEnablePin(uint8_t level);
 uint8_t dataReady(void);
 
-#endif /* BSP_INC_CC2D23_PINS_H_ */
+#endif /* BSP_INC_TEMP_HUM_CLICK20_PINS_H_ */

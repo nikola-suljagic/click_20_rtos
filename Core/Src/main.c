@@ -17,14 +17,14 @@
  */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include "temp_hum_click20.h"
+#include "temp_hum_click20_pins.h"
 #include "main.h"
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 #include "stdio.h"
 #include "i2c.h"
-#include "cc2d23_pins.h"
-#include "cc2d23.h"
 #include "semphr.h"
 #include "task.h"
 #include "logging.h"
@@ -87,7 +87,7 @@ int main(void) {
 	MX_GPIO_Init();
 	MX_USART6_UART_Init();
 	MX_I2C1_Init();
-	cc2d23Init(CMD_MODE, i2cWrite, i2cRead, setEnablePin, dataReady, HAL_Delay);
+	tempHumClick20Init(CMD_MODE, i2cWrite, i2cRead, setEnablePin, dataReady, HAL_Delay);
 
 	/* Init scheduler */
 	osKernelInitialize();
@@ -278,7 +278,7 @@ void TempHumMeasurements(void *argument) {
 	static float temperature, humidity;
 	/* Infinite loop */
 	for (;;) {
-		cc2d23GetMeasurements(&temperature, &humidity);
+		tempHumClick20GetMeasurements(&temperature, &humidity);
 		logEvent(createMeasurementEvent(TempMeasurements, &temperature));
 		logEvent(createMeasurementEvent(HumMeasurements, &humidity));
 		osDelay(4000);
