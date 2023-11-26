@@ -10,7 +10,6 @@
 
 #include "stdint.h"
 
-
 #define TEMP_MULTIPLIER  165.0
 #define TEMP_OFFSET  40.0
 #define TEMP_SCLE 0x4000
@@ -27,18 +26,16 @@ typedef uint8_t (*data_ready_t)(void);
 typedef void (*delay_t)(uint32_t delay);
 
 typedef enum CC2D23OperationMode {
-	CMD_MODE,
-	NORMAL_MODE
+	CMD_MODE, NORMAL_MODE
 } CC2D23OperationMode_t;
 
-
 typedef enum CC2D23Status {
-	CC2D23Success,
-	CC2D23Error
+	CC2D23Success, CC2D23Error
 } CC2D23Status_t;
 
-CC2D23Status_t cc2d23Init(CC2D23OperationMode_t opMode, i2c_func_t i2cWrite, i2c_func_t i2cRead,
-		                  set_enebale_pin_t enable_pin, data_ready_t data_ready, delay_t delay);
+CC2D23Status_t cc2d23Init(CC2D23OperationMode_t opMode, i2c_func_t i2cWrite,
+		i2c_func_t i2cRead, set_enebale_pin_t enable_pin,
+		data_ready_t data_ready, delay_t delay);
 void cc2d23Reset();
 CC2D23Status_t cc2d23GetMeasurements(float *temperature, float *humidity);
 
