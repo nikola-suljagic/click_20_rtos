@@ -25,8 +25,8 @@
 /* Private includes ----------------------------------------------------------*/
 #include "stdio.h"
 #include "i2c.h"
-#include "semphr.h"
 #include "task.h"
+#include "tasks.h"
 #include "logging.h"
 
 /* Private variables ---------------------------------------------------------*/
@@ -34,41 +34,17 @@ I2C_HandleTypeDef hi2c1;
 
 UART_HandleTypeDef huart6;
 
-/* Definitions for Measurements */
-osThreadId_t MeasurementsHandle;
-const osThreadAttr_t Measurements_attributes = { .name = "Measurements",
-		.stack_size = 512 * 4, .priority = (osPriority_t) osPriorityNormal, };
-/* Definitions for Buttons */
-osThreadId_t ButtonsHandle;
-const osThreadAttr_t Buttons_attributes = { .name = "Buttons", .stack_size = 128
-		* 4, .priority = (osPriority_t) osPriorityLow, };
-
-osThreadId_t LoggingHandle;
-const osThreadAttr_t Logging_attributes = { .name = "loggingHandle",
-		.stack_size = 1024 * 4, .priority = (osPriority_t) osPriorityLow, };
-
-osMessageQueueId_t loggingQueue;
-const osMessageQueueAttr_t loggingQueue_attributes = { .name = "loggingQueue" };
-
-/* Definitions for buttonSemaphore */
-osSemaphoreId_t buttonSemaphoreHandle;
-const osSemaphoreAttr_t buttonSemaphore_attributes =
-		{ .name = "buttonSemaphore" };
-
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART6_UART_Init(void);
 static void MX_I2C1_Init(void);
-void TempHumMeasurements(void *argument);
-void ProcessingButtons(void *argument);
-void loggingHandle(void *argument);
 
 /* Private user code ---------------------------------------------------------*/
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	BaseType_t xHigherPriorityTaskWoken;
 	if (GPIO_Pin == GPIO_PIN_3 || GPIO_Pin == GPIO_PIN_5) {
-		xSemaphoreGiveFromISR(buttonSemaphoreHandle, &xHigherPriorityTaskWoken);
+		xSemaphoreGiveFromISR(getButtonSemaphore(), &xHigherPriorityTaskWoken);
 	}
 }
 
@@ -92,13 +68,7 @@ int main(void) {
 	/* Init scheduler */
 	osKernelInitialize();
 
-	MeasurementsHandle = osThreadNew(TempHumMeasurements, NULL,
-			&Measurements_attributes);
-	ButtonsHandle = osThreadNew(ProcessingButtons, NULL, &Buttons_attributes);
-	LoggingHandle = osThreadNew(loggingHandle, NULL, &Logging_attributes);
-	loggingQueue = osMessageQueueNew(16, sizeof(Event_t),
-			&loggingQueue_attributes);
-	buttonSemaphoreHandle = osSemaphoreNew(1, 1, &buttonSemaphore_attributes);
+	tasksInit();
 
 	/* Start scheduler */
 	osKernelStart();
@@ -259,53 +229,6 @@ int _write(int file, char *ptr, int len) {
 }
 
 
-/**
- * @brief  Function implementing the Measurements thread.
- * @param  argument: Not used
- * @retval None
- */
-void TempHumMeasurements(void *argument) {
-	static float temperature, humidity;
-	/* Infinite loop */
-	for (;;) {
-		tempHumClick20GetMeasurements(&temperature, &humidity);
-		logEvent(createEvent(TempMeasurements, &temperature));
-		logEvent(createEvent(HumMeasurements, &humidity));
-		osDelay(4000);
-	}
-}
-
-/**
- * @brief Function implementing the loggingHandle thread.
- * @param argument: Not used
- * @retval None
- */
-void loggingHandle(void *argument) {
-	Event_t event;
-	uint8_t prio = 1;
-	/* Infinite loop */
-	for (;;) {
-		if (osMessageQueueGet(loggingQueue, &event, &prio, 100000) == osOK) {
-			handleEvent(event);
-		}
-	}
-}
-
-/**
- * @brief Function implementing the Buttons thread.
- * @param argument: Not used
- * @retval None
- */
-void ProcessingButtons(void *argument) {
-	xSemaphoreTake(buttonSemaphoreHandle, 0xFFFF);
-	for (;;) {
-		xSemaphoreTakeRecursive(buttonSemaphoreHandle, portMAX_DELAY);
-		if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5) == GPIO_PIN_SET) {
-			int32_t value = 1;
-			logEvent(createEvent(UserButton1Pressed, &value));
-		}
-	}
-}
 
 /**
  * @brief  Period elapsed callback in non blocking mode
