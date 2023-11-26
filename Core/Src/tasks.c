@@ -40,9 +40,9 @@ void tasksInit(void) {
 			&Measurements_attributes);
 	ButtonsHandle = osThreadNew(ProcessingButtons, NULL, &Buttons_attributes);
 	LoggingHandle = osThreadNew(loggingHandle, NULL, &Logging_attributes);
-	loggingQueue = osMessageQueueNew(16, sizeof(Event_t),
+	loggingQueue = osMessageQueueNew(LOGGING_QUEUE_SIZE, sizeof(Event_t),
 			&loggingQueue_attributes);
-	buttonSemaphoreHandle = osSemaphoreNew(1, 1, &buttonSemaphore_attributes);
+	buttonSemaphoreHandle = osSemaphoreNew(10, 1, &buttonSemaphore_attributes);
 }
 
 
