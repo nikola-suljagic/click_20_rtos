@@ -21,29 +21,13 @@
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
 #include "stdio.h"
 #include "i2c.h"
 #include "cc2d23_pins.h"
 #include "cc2d23.h"
 #include "semphr.h"
 #include "task.h"
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
+#include "logging.h"
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
@@ -64,11 +48,28 @@ const osThreadAttr_t Buttons_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+
+
+osThreadId_t LoggingHandle;
+const osThreadAttr_t Logging_attributes = {
+  .name = "loggingHandle",
+  .stack_size = 1024 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+
+osMessageQueueId_t loggingQueue;
+const osMessageQueueAttr_t loggingQueue_attributes = {
+  .name = "loggingQueue"
+};
+
+
 /* Definitions for buttonSemaphore */
 osSemaphoreId_t buttonSemaphoreHandle;
 const osSemaphoreAttr_t buttonSemaphore_attributes = {
   .name = "buttonSemaphore"
 };
+
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -80,6 +81,7 @@ static void MX_USART6_UART_Init(void);
 static void MX_I2C1_Init(void);
 void TempHumMeasurements(void *argument);
 void ProcessingButtons(void *argument);
+void loggingHandle(void *argument);
 
 /* Private user code ---------------------------------------------------------*/
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
@@ -96,12 +98,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   */
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
-
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
@@ -112,21 +108,25 @@ int main(void)
   MX_GPIO_Init();
   MX_USART6_UART_Init();
   MX_I2C1_Init();
-  /* USER CODE BEGIN 2 */
   cc2d23Init(CMD_MODE, i2cWrite, i2cRead, setEnablePin, dataReady, HAL_Delay);
 
   /* Init scheduler */
   osKernelInitialize();
 
+  printf("Hello Hello \n\n");
+
+//  HAL_UART_Transmit(&huart6, (uint8_t*) "Hello Hello \n\n", sizeof("Hello Hello \n\n"), HAL_MAX_DELAY);
+
   /* creation of buttonSemaphore */
-  buttonSemaphoreHandle = osSemaphoreNew(1, 1, &buttonSemaphore_attributes);
 
   /* Create the thread(s) */
   /* creation of Measurements */
   MeasurementsHandle = osThreadNew(TempHumMeasurements, NULL, &Measurements_attributes);
-
-  /* creation of Buttons */
   ButtonsHandle = osThreadNew(ProcessingButtons, NULL, &Buttons_attributes);
+  LoggingHandle = osThreadNew(loggingHandle, NULL, &Logging_attributes);
+
+  loggingQueue = osMessageQueueNew (16, sizeof(Event_t), &loggingQueue_attributes);
+  buttonSemaphoreHandle = osSemaphoreNew(1, 1, &buttonSemaphore_attributes);
 
   /* Start scheduler */
   osKernelStart();
@@ -331,9 +331,25 @@ void TempHumMeasurements(void *argument)
   for(;;)
   {
 	cc2d23GetMeasurements(&temperature, &humidity);
-	printf("temperature = %f\n\n", temperature);
-	printf("humidity = %f\n\n", humidity);
+	logEvent(createMeasurementEvent(TempMeasurements, &temperature));
+	logEvent(createMeasurementEvent(HumMeasurements, &humidity));
     osDelay(4000);
+  }
+  /* USER CODE END 5 */
+}
+
+
+
+void loggingHandle(void *argument)
+{
+	Event_t event;
+	uint8_t prio = 1;
+  /* Infinite loop */
+  for(;;)
+  {
+	  if (osMessageQueueGet(loggingQueue, &event, &prio, 100000) == osOK) {
+		  handleEvent(event);
+	  }
   }
   /* USER CODE END 5 */
 }
@@ -355,7 +371,8 @@ void ProcessingButtons(void *argument)
   {
     xSemaphoreTakeRecursive(buttonSemaphoreHandle, portMAX_DELAY);
     if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5) == GPIO_PIN_SET) {
-      printf("Button PA5 pressed !\n\n");
+      int32_t value = 1;
+      logEvent(createMeasurementEvent(UserButton1Pressed, &value));
     }
   }
 }
