@@ -10,26 +10,19 @@
 
 #include "cmsis_os.h"
 
-
 typedef union EventValue {
 	float floatVal;
 	int32_t intVal;
 } EventValue_t;
 
-
 typedef enum EventType {
-	UserButton1Pressed,
-	UserButton2Pressed,
-	TempMeasurements,
-	HumMeasurements
+	UserButton1Pressed, UserButton2Pressed, TempMeasurements, HumMeasurements
 } EventType_t;
-
 
 typedef struct Event {
 	EventType_t type;
 	EventValue_t value;
 } Event_t;
-
 
 osMessageQueueId_t getLoggingQueue(void);
 void logEvent(Event_t event);
