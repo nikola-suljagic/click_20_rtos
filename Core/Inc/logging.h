@@ -24,9 +24,21 @@ typedef struct Event {
 	EventValue_t value;
 } Event_t;
 
-osMessageQueueId_t getLoggingQueue(void);
+
+/// Log specified event
+/// \param[in]     event          event that will be logged via serial  line..
+/// \return void
 void logEvent(Event_t event);
-Event_t createMeasurementEvent(EventType_t type, void *value);
+
+/// Create measurement type of event
+/// \param[in]     type          event that will be logged via serial  line..
+/// \param[in]     value         pointer to event value.
+/// \return return created event
+Event_t createEvent(EventType_t type, void *value);
+
+/// Handle event and send event in json format via serial line
+/// \param[in]     event          logging event
+/// \return void
 void handleEvent(Event_t event);
 
 #endif /* INC_LOGGING_H_ */
