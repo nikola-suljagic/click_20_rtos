@@ -19,12 +19,12 @@
 * Navigate to the folder where project reside
 * Configuring OpenOCD debugger:
     - Install GNU ARM C/C++ OpenOCD Debugging plugin:<br> 
-    ![Alt text](image-2.png)
+    ![Alt text](docs/images/image-2.png)
     - Right click on project and go Debug As -> Debug Configurations -> GDB Open OCD Debugging: <br>
-    ![Alt text](image-3.png)
+    ![Alt text](docs/images/image-3.png)
     - Setup debug configuration: <br>
-    ![Alt text](image-4.png)
+    ![Alt text](docs/images/image-4.png)
 * Configure printf with floating point numbers:
     - Right click on the project and go to Properties -> C/C++ Build -> Settings -> MCU settings 
     - Check 'Use float with printf from (-u_printf_float)': <br>
-    ![Alt text](image-5.png)
+    ![Alt text](docs/images/image-5.png)
