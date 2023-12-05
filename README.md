@@ -28,3 +28,24 @@
     - Right click on the project and go to Properties -> C/C++ Build -> Settings -> MCU settings 
     - Check 'Use float with printf from (-u_printf_float)': <br>
     ![Alt text](docs/images/image-5.png)
+
+
+## Download firmware
+
+### CODEGRIP
+* Open CODEGRIP
+* Navigate to .bin file in Debug or Release folder: <br><br>
+    ![Alt text](docs/images/image-6.png)
+* Press write command: <br><br>
+    ![Alt text](docs/images/image-7.png)
+
+
+## Logging messages
+### Logging messages are expressed in json format. Logging structure has 2 fields `name` and `value`.
+### In order to see messages on host PC, it needs to setup serial port
+### Steps to setup serial port on Putty:
+* Open putty and setup baud rate to 921600 and pick right serial port (in this case it is /dev/ttyUSB0): <br><br>
+    ![Alt text](docs/images/image-8.png)
+* Terminal output should look: <br><br>
+    ![Alt text](docs/images/image-9.png)
+
