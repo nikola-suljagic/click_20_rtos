@@ -30,12 +30,12 @@ Event_t createEvent(EventType_t type, void *value) {
 
 void handleEvent(Event_t event) {
 	if (event.type == TempMeasurements) {
-		printf("{'name': 'Temperature', 'value': %f}\n", event.value.floatVal);
+		printf("{'name': 'Temperature', 'value': %f}\n\r", event.value.floatVal);
 	} else if (event.type == HumMeasurements) {
-		printf("{'name': 'Humidity', 'value': %f}\n", event.value.floatVal);
+		printf("{'name': 'Humidity', 'value': %f}\n\r", event.value.floatVal);
 	} else if (event.type == UserButton1Pressed) {
-		printf("{'name': 'Button1', 'value': %ld}\n", event.value.intVal);
+		printf("{'name': 'Button1', 'value': %ld}\n\r", event.value.intVal);
 	} else {
-		printf("{'name': 'Button2', 'value': %ld}\n", event.value.intVal);
+		printf("{'name': 'Button2', 'value': %ld}\n\r", event.value.intVal);
 	}
 }
