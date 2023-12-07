@@ -2,8 +2,24 @@
 
 
 ## Description
-### This project showcase how FREE RTOS can be used for 
-### MirkoE development borad Sensor Fusion for ARMv8
+This project showcase how FREE RTOS can be used for MirkoE development borad Sensor Fusion for ARMv8.
+
+### Hardware used in project
+* Development board: [Fusion for ARMv8] <https://www.mikroe.com/fusion-for-arm>
+* Sensor development board: [Temp&Hum20 click] <https://www.mikroe.com/temphum-20-click>
+* MCU board SiBRAIN for STM32: [STM32F407ZG]
+
+
+### Software used in project
+* Development: [STM Cube IDE] <https://www.st.com/en/development-tools/stm32cubeide.html>
+* FW download: [CODEGRIP] <https://www.mikroe.com/codegrip>
+* Serial port client: [PuTTY] <https://www.putty.org/>
+
+### HW setup:
+* Plug Temp&Hum20 click board to mikroBUS socket 1
+* Plug SiBRAIN for STM32 (STM32F407ZG) to MCU card socket
+* Connect POWER/DEBUG with host CPU in order to enable debugging as well as provide power for board
+* Connect USB-UART with host CPU to enable sending messages to serial port (logging)
 
 # Project setup
 ## Setup Sensor fusion for armv8 dev board
