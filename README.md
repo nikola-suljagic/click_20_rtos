@@ -7,7 +7,7 @@ This project showcase how FREE RTOS can be used for MirkoE development borad Sen
 ### Hardware used in project
 * Development board: [Fusion for ARMv8] <https://www.mikroe.com/fusion-for-arm>
 * Sensor development board: [Temp&Hum20 click] <https://www.mikroe.com/temphum-20-click>
-* MCU board SiBRAIN for STM32: [STM32F407ZG]
+* MCU board SiBRAIN for STM32: [STM32F407ZG] <https://www.mikroe.com/mcu-card-for-stm32-stm32f407zg>
 
 
 ### Software used in project
